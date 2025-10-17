@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoicer Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Invoicer App</h1>
+        <button id="test-db">Test Database Connection</button>
+
+        <div id="db-result"></div>
+        <a href="{{ url_for('invoices.create_invoice') }}">
+  <button>Create New Invoice</button>
+</a>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

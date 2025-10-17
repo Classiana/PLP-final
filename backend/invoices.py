@@ -4,16 +4,19 @@ import datetime
 
 invoices_bp = Blueprint('invoices', __name__, template_folder='templates')
 
+# ---- Invoice creation page ----
 @invoices_bp.route('/create', methods=['GET','POST'])
 def create_invoice():
-    if 'business_id' not in session:
-        return redirect(url_for('auth.login'))
+    # TEMPORARY: skip login check for testing
+    # if 'business_id' not in session:
+    #     return redirect(url_for('auth.login'))
+    business_id = 1  # remove/comment after login is implemented
 
     if request.method == 'POST':
         data = request.get_json()
-        business_id = session['business_id']
         client_id = data.get('client_id')
         items = data.get('items', [])  # list of {item_id, description, qty, unit_price, tax}
+
         subtotal = sum([float(i['qty'])*float(i['unit_price']) for i in items])
         tax = sum([float(i.get('tax',0)) for i in items])
         discount = float(data.get('discount', 0))
@@ -40,4 +43,36 @@ def create_invoice():
         return jsonify({"status":"ok","invoice_id":invoice_id}), 201
 
     # GET: render the invoice create UI
-    return render_template('invoice_edit.html')
+    return render_template('edit_invoice.html')
+
+
+# ---- Test DB connection route ----
+@invoices_bp.route('/test', methods=['GET'])
+def test_db():
+    try:
+        conn = get_conn()
+        cursor = conn.cursor()
+        cursor.execute("SELECT DATABASE();")
+        db_name = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return {"message": f"Connected successfully to {db_name[0]}"}
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+
+# ---- Fetch clients for dropdown ----
+@invoices_bp.route('/clients', methods=['GET'])
+def get_clients():
+
+    try:
+        business_id = 1
+        conn = get_conn()
+        cur = conn.cursor(dictionary=True)
+        cur.execute("SELECT id, name FROM clients WHERE business_id=%s", (business_id,))
+        clients = cur.fetchall()
+        cur.close()
+        conn.close()
+        return jsonify(clients)
+    except Exception as e:
+        return {"error": str(e)}, 500
