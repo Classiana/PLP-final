@@ -1,8 +1,22 @@
 from flask import Blueprint, request, render_template, jsonify
-from db import get_conn
+from db import get_conn as get_db
 import datetime
+from flask import Blueprint, render_template
 
 invoices_bp = Blueprint('invoices', __name__, template_folder='templates')
+
+@invoices_bp.route('/clients')
+def show_clients():
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT id, name, phone, email FROM clients LIMIT 10")
+    clients = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('clients.html', clients=clients)
+
+
+#invoices_bp = Blueprint('invoices', __name__, template_folder='templates')
 
 # ---- Invoice creation page ----
 @invoices_bp.route('/create', methods=['GET', 'POST'])

@@ -12,5 +12,11 @@ pool = mysql.connector.pooling.MySQLConnectionPool(
     auth_plugin='mysql_native_password'
 )
 
+def get_db():
+    return pool.get_connection()
 def get_conn():
     return pool.get_connection()
+
+# Alias for modules that call get_db()
+get_db = get_conn
+

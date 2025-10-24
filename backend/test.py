@@ -8,3 +8,4 @@ try:
     conn.close()
 except Exception as e:
     print("Error:", e)
+#cur.execute("SELECT id, name FROM clients")
