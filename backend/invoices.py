@@ -76,3 +76,20 @@ def get_clients():
         return jsonify(clients)
     except Exception as e:
         return {"error": str(e)}, 500
+@invoices_bp.route('/all', methods=['GET'])
+def get_all_invoices():
+    try:
+        conn = get_conn()
+        cur = conn.cursor(dictionary=True)
+        cur.execute("""
+            SELECT i.id, i.invoice_number, c.name AS client_name, i.total, i.status, i.date
+            FROM invoices i
+            JOIN clients c ON i.client_id = c.id
+            ORDER BY i.date DESC
+        """)
+        invoices = cur.fetchall()
+        cur.close()
+        conn.close()
+        return jsonify(invoices)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
